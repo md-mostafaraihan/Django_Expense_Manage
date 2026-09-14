@@ -22,8 +22,8 @@ ENV/
 local_settings.py
 db.sqlite3-journal
 
-# Static files cache
-staticfiles/
+# Static files cache - NOT ignored so Vercel deployment includes them
+# staticfiles/
 
 # Node
 node_modules/
