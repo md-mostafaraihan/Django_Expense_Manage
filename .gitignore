@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+.venv/
+.ven/
+env/
+venv/
+ENV/
+
+# Environment Variables
+.env
+!.env.example
+
+# Django
+# Note: db.sqlite3 can be committed if pre-populated for exam submission,
+# but keep scratch and cache ignored
+*.log
+local_settings.py
+db.sqlite3-journal
+
+# Static files cache
+staticfiles/
+
+# Node
+node_modules/
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

@@ -1,57 +1,197 @@
 {% extends "base.html" %}
-{% block title %}Edit Profile | TakaSave{% endblock %}
+{% block title %}Edit Profile & Security | TakaSave{% endblock %}
+{% block meta_description %}Manage and update your TakaSave profile, email address, and security password with two-factor email verification.{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-      <div class="card glass shadow border-0 rounded-4 mt-4 mb-5">
-        <div class="card-body p-5">
-          <h3 class="card-title fw-bold text-center mb-4">Edit Profile</h3>
-          <form method="POST" action="{% url 'profile_edit' %}">
-            {% csrf_token %}
+<div class="row justify-content-center py-4">
+  <div class="col-12 col-md-8 col-lg-7 col-xl-6">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <a href="{% url 'account_details' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <i class="bi bi-arrow-left me-1"></i>Back to Profile
+      </a>
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 fw-medium">
+        <i class="bi bi-shield-check me-1"></i>Secure 2FA Protected
+      </span>
+    </div>
+
+    <div class="card glass shadow border-0 rounded-4 mb-5">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+               style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(124, 58, 237, 0.15));">
+            <i class="bi bi-person-gear fs-2 text-primary"></i>
+          </div>
+          <h3 class="card-title fw-bold text-dark text-gradient mb-1">Edit Account Profile</h3>
+          <p class="text-muted small mb-0">Update your username, email, or account password</p>
+        </div>
+
+        <div class="p-3 bg-light rounded-4 mb-4 d-flex align-items-start border">
+          <i class="bi bi-shield-lock text-primary fs-4 me-3 mt-1"></i>
+          <div class="small text-muted">
+            <strong class="text-dark d-block mb-1">Confirmation Required:</strong>
+            For your security, before saving any changes (email, password, or username), a 6-digit confirmation code will be sent to your current email: <strong class="text-dark">{{ user.email }}</strong>.
+          </div>
+        </div>
+
+        <form method="POST" action="{% url 'profile_edit' %}" id="profileEditForm" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <h6 class="fw-bold text-dark text-uppercase small tracking-wide mb-3">
+              <i class="bi bi-person-badge text-primary me-2"></i>Account Information
+            </h6>
+
             <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="{{ form_username|default:user.username }}" required>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Username"
+                     value="{{ form_username|default:user.username }}" required autocomplete="username">
               <label for="username" class="text-muted"><i class="bi bi-person me-2"></i>Username</label>
             </div>
-            <div class="form-floating mb-3">
-              <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ form_email|default:user.email }}" required>
-              <label for="email" class="text-muted"><i class="bi bi-envelope me-2"></i>Email</label>
-            </div>
-            <div class="form-floating mb-3 position-relative">
-              <input type="password" class="form-control" id="password1" name="password1" placeholder="New Password">
-              <label for="password1" class="text-muted"><i class="bi bi-shield-lock me-2"></i>New Password (optional)</label>
-              <button type="button" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2" onclick="togglePassword('password1', this)"><i class="bi bi-eye"></i></button>
-            </div>
-            <div class="form-floating mb-4 position-relative">
-              <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password">
-              <label for="password2" class="text-muted"><i class="bi bi-shield-lock me-2"></i>Confirm Password (optional)</label>
-              <button type="button" class="btn btn-outline-secondary btn-sm position-absolute top-50 end-0 translate-middle-y me-2" onclick="togglePassword('password2', this)"><i class="bi bi-eye"></i></button>
-            </div>
-            <div class="d-grid mt-4 mb-3">
-              <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm">Save Change</button>
-            </div>
-          </form>
 
-        </div>
+            <div class="form-floating mb-2">
+              <input type="email" class="form-control" id="email" name="email" placeholder="Email address"
+                     value="{{ form_email|default:user.email }}" required autocomplete="email">
+              <label for="email" class="text-muted"><i class="bi bi-envelope me-2"></i>Email Address</label>
+            </div>
+            <div class="form-text small text-muted px-1">
+              Current registered email is <strong>{{ user.email }}</strong>. If changed, the confirmation code will be delivered to this current email.
+            </div>
+          </div>
+
+          <div class="mb-4 pt-2 border-top">
+            <div class="d-flex align-items-center justify-content-between my-3">
+              <h6 class="fw-bold text-dark text-uppercase small tracking-wide mb-0">
+                <i class="bi bi-key text-primary me-2"></i>Security & Password
+              </h6>
+              <span class="badge bg-secondary-subtle text-muted rounded-pill small">Optional</span>
+            </div>
+            <p class="text-muted small mb-3">Leave password fields blank if you only want to update your name or email.</p>
+
+            <div class="form-floating mb-3 position-relative">
+              <input type="password" class="form-control pe-5" id="password1" name="password1" placeholder="New Password"
+                     autocomplete="new-password">
+              <label for="password1" class="text-muted"><i class="bi bi-shield-lock me-2"></i>New Password</label>
+              <button type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2 rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 34px; height: 34px;" onclick="togglePasswordVisibility('password1', this)" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+
+            <div id="passwordStrengthWrapper" class="mb-3 d-none">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="small text-muted">Password strength:</span>
+                <span id="strengthText" class="small fw-semibold text-muted">Too Short</span>
+              </div>
+              <div class="progress" style="height: 6px; border-radius: 999px; background: rgba(0,0,0,0.06);">
+                <div id="strengthBar" class="progress-bar rounded-pill" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+
+            <div class="form-floating mb-2 position-relative">
+              <input type="password" class="form-control pe-5" id="password2" name="password2" placeholder="Confirm New Password"
+                     autocomplete="new-password">
+              <label for="password2" class="text-muted"><i class="bi bi-check2-circle me-2"></i>Confirm New Password</label>
+              <button type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2 rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 34px; height: 34px;" onclick="togglePasswordVisibility('password2', this)" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div id="passwordMatchMessage" class="small text-danger d-none px-1">Passwords do not match!</div>
+          </div>
+
+          <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm d-flex align-items-center justify-content-center">
+              <span>Continue & Send Security Code</span>
+              <i class="bi bi-arrow-right ms-2"></i>
+            </button>
+            <a href="{% url 'account_details' %}" class="btn btn-light btn-lg rounded-pill text-muted fw-semibold mt-1">
+              Cancel
+            </a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-function togglePassword(fieldId, btn) {
-  const field = document.getElementById(fieldId);
-  if (!field) return;
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
   const icon = btn.querySelector('i');
-  if (field.type === 'password') {
-    field.type = 'text';
-    if (icon) icon.classList.replace('bi-eye', 'bi-eye-slash');
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) {
+      icon.classList.remove('bi-eye');
+      icon.classList.add('bi-eye-slash');
+    }
   } else {
-    field.type = 'password';
-    if (icon) icon.classList.replace('bi-eye-slash', 'bi-eye');
+    input.type = 'password';
+    if (icon) {
+      icon.classList.remove('bi-eye-slash');
+      icon.classList.add('bi-eye');
+    }
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const pwd1 = document.getElementById('password1');
+  const pwd2 = document.getElementById('password2');
+  const strengthWrapper = document.getElementById('passwordStrengthWrapper');
+  const strengthBar = document.getElementById('strengthBar');
+  const strengthText = document.getElementById('strengthText');
+  const matchMsg = document.getElementById('passwordMatchMessage');
+
+  if (pwd1) {
+    pwd1.addEventListener('input', function() {
+      const val = pwd1.value;
+      if (!val) {
+        strengthWrapper.classList.add('d-none');
+        return;
+      }
+      strengthWrapper.classList.remove('d-none');
+
+      let score = 0;
+      if (val.length >= 8) score += 25;
+      if (/[A-Z]/.test(val)) score += 25;
+      if (/[0-9]/.test(val)) score += 25;
+      if (/[^A-Za-z0-9]/.test(val)) score += 25;
+
+      strengthBar.style.width = score + '%';
+
+      if (score <= 25) {
+        strengthBar.className = 'progress-bar bg-danger rounded-pill';
+        strengthText.textContent = 'Weak';
+        strengthText.className = 'small fw-semibold text-danger';
+      } else if (score <= 50) {
+        strengthBar.className = 'progress-bar bg-warning rounded-pill';
+        strengthText.textContent = 'Fair';
+        strengthText.className = 'small fw-semibold text-warning';
+      } else if (score <= 75) {
+        strengthBar.className = 'progress-bar bg-info rounded-pill';
+        strengthText.textContent = 'Good';
+        strengthText.className = 'small fw-semibold text-info';
+      } else {
+        strengthBar.className = 'progress-bar bg-success rounded-pill';
+        strengthText.textContent = 'Strong';
+        strengthText.className = 'small fw-semibold text-success';
+      }
+
+      checkMatch();
+    });
+  }
+
+  function checkMatch() {
+    if (!pwd2 || !pwd1) return;
+    if (pwd2.value && pwd1.value !== pwd2.value) {
+      matchMsg.classList.remove('d-none');
+    } else {
+      matchMsg.classList.add('d-none');
+    }
+  }
+
+  if (pwd2) {
+    pwd2.addEventListener('input', checkMatch);
+  }
+});
 </script>
 {% endblock %}
-

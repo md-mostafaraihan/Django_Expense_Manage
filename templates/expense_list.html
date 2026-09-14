@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Expenses | TakaSave{% endblock %}
+{% block title %}Expenses & Transactions | TakaSave{% endblock %}
+{% block meta_description %}View and filter your complete transaction history, search expenses, categorize spending, and track money flow with TakaSave.{% endblock %}
 
 {% block content %}
 <div class="container my-4">
-    <div class="row mb-5 align-items-center">
+    <div class="row mb-4 align-items-center">
         <div class="col-12 col-md-6 mb-3 mb-md-0">
             <h2 class="fw-bold mb-1 text-dark">Transaction History</h2>
             <p class="text-muted mb-0">View, edit, and manage all your expense records.</p>
@@ -16,36 +17,35 @@
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="row g-4 mb-5">
-        <div class="col-12 col-md-6">
-            <div class="card border-0 shadow-sm h-100 rounded-4 hover-lift" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-left: 5px solid var(--accent-color) !important;">
-                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+    
+    <div class="row g-3 mb-4">
+        <div class="col-6">
+            <div class="card border-0 shadow-sm rounded-4 hover-lift" style="background: #ffffff; border-left: 5px solid #4f46e5 !important; border: 1px solid rgba(226, 232, 240, 0.85);">
+                <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Total Expenses</h6>
-                        <h3 class="fw-extrabold text-dark mb-0">৳ {{ total_expenses|floatformat:2 }}</h3>
+                        <div class="text-muted fw-bold text-uppercase tracking-wider mb-1" style="font-size: 0.72rem; letter-spacing: 0.8px;">Total Expenses</div>
+                        <h3 class="fw-bold text-dark mb-0 fs-4">৳ {{ total_expenses|floatformat:2 }}</h3>
                     </div>
-                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; border-radius: 12px; background-color: rgba(79, 70, 229, 0.1);">
-                        <i class="bi bi-wallet2 fs-3 text-gradient"></i>
+                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; border-radius: 12px; background-color: rgba(79, 70, 229, 0.08);">
+                        <i class="bi bi-wallet2 fs-4 text-primary"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
-            <div class="card border-0 shadow-sm h-100 rounded-4 hover-lift" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-left: 5px solid #0ea5e9 !important;">
-                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div class="col-6">
+            <div class="card border-0 shadow-sm rounded-4 hover-lift" style="background: #ffffff; border-left: 5px solid #0ea5e9 !important; border: 1px solid rgba(226, 232, 240, 0.85);">
+                <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Total Transactions</h6>
-                        <h3 class="fw-extrabold text-dark mb-0">{{ result|length }}</h3>
+                        <div class="text-muted fw-bold text-uppercase tracking-wider mb-1" style="font-size: 0.72rem; letter-spacing: 0.8px;">Total Transactions</div>
+                        <h3 class="fw-bold text-dark mb-0 fs-4">{{ result|length }}</h3>
                     </div>
-                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; border-radius: 12px; background-color: rgba(14, 165, 233, 0.1);">
-                        <i class="bi bi-receipt fs-3" style="color: #0ea5e9;"></i>
+                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; border-radius: 12px; background-color: rgba(14, 165, 233, 0.08);">
+                        <i class="bi bi-receipt fs-4" style="color: #0ea5e9;"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <div class="card shadow-sm rounded-4 border-0 mb-5 overflow-hidden">
         <div class="card-body p-0 table-responsive">
@@ -89,15 +89,15 @@
                     </td>
                     <td class="py-3 text-end pe-4">
                         <div class="d-flex justify-content-end gap-2">
-                            <!-- View Button -->
+                            
                             <a href="#" class="btn btn-sm btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #f8fafc;" data-bs-toggle="modal" data-bs-target="#expenseModal{{ expense.id }}" title="View Details">
                                 <i class="bi bi-eye-fill text-secondary"></i>
                             </a>
-                            <!-- Edit -->
+                            
                             <a href="{% url 'expense_update' expense.id %}" class="btn btn-sm btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #f8fafc;" data-bs-toggle="tooltip" title="Edit">
                                 <i class="bi bi-pencil-fill text-primary"></i>
                             </a>
-                            <!-- Delete -->
+                            
                             <a href="{% url 'expense_delete' expense.id %}" class="btn btn-sm btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #f8fafc;" data-bs-toggle="tooltip" title="Delete">
                                 <i class="bi bi-trash3-fill text-danger"></i>
                             </a>
@@ -105,7 +105,7 @@
                     </td>
                 </tr>
 
-                <!-- Modal for full expense -->
+                
                   <div class="modal fade" id="expenseModal{{ expense.id }}" tabindex="-1" aria-labelledby="expenseModalLabel{{ expense.id }}" aria-hidden="true" aria-live="polite" data-bs-backdrop="false" data-bs-keyboard="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
                       <div class="modal-content rounded-4 bg-white text-dark">
@@ -159,8 +159,8 @@
 
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted fw-semibold py-5">
-                        <i class="fa-solid fa-folder-open fs-2 mb-3 text-light-gray" style="color: #dee2e6;"></i><br>
+                    <td colspan="7" class="text-center text-muted fw-semibold py-5">
+                        <i class="bi bi-inbox fs-2 d-block mb-2" style="color: #cbd5e1;"></i>
                         No expenses found. Time to add some!
                     </td>
                 </tr>
@@ -170,10 +170,4 @@
         </div>
     </div>
 </div>
-
-<!-- Initialize Bootstrap tooltips -->
-<script>
-const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-const tooltipList = tooltipTriggerList.map(el => new bootstrap.Tooltip(el))
-</script>
 {% endblock %}

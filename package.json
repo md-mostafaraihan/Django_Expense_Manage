@@ -1,0 +1,30 @@
+{
+  "name": "django_expense_manage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/md-mostafaraihan/Django_Expense_Manage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/md-mostafaraihan/Django_Expense_Manage/issues"
+  },
+  "homepage": "https://github.com/md-mostafaraihan/Django_Expense_Manage#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.13.1",
+    "chart.js": "^4.5.1"
+  }
+}

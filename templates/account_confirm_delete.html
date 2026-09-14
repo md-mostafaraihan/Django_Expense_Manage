@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row justify-content-center py-4">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-12 col-md-8 col-lg-6">
         <div class="card shadow border-0 rounded-4 mt-3 mb-5">
             <div class="card-body p-5 text-center">
                 <div class="icon-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border-radius: 50%; background-color: rgba(220, 53, 69, 0.1);">
@@ -25,7 +25,7 @@
                 <form method="POST" action="{% url 'account_delete' %}" novalidate class="m-0">
                     {% csrf_token %}
 
-                    <!-- OTP Code Input -->
+                    
                     <div class="form-floating mb-3 max-width-300 mx-auto" style="max-width: 300px;">
                         <input 
                             type="text" 
@@ -39,7 +39,7 @@
                         <label for="otp" class="text-muted text-start w-100"><i class="bi bi-key me-2"></i>Enter 6-Digit OTP</label>
                     </div>
 
-                    <!-- Timer and Resend -->
+                    
                     <div class="d-flex justify-content-between align-items-center mb-4 small px-1 max-width-300 mx-auto" style="max-width: 300px;">
                         <div class="text-muted">
                             <i class="bi bi-clock-history me-1"></i> OTP expires in: <span id="timer" class="fw-bold text-danger">05:00</span>
@@ -65,7 +65,6 @@
 </div>
 
 <script>
-    // Setup countdown timer based on remaining seconds sent from Django
     let remainingSeconds = {{ remaining_seconds|default:300 }};
     const timerElement = document.getElementById('timer');
     const resendLink = document.getElementById('resend-link');
@@ -88,7 +87,6 @@
         setTimeout(updateTimer, 1000);
     }
 
-    // Start timer on page load
     updateTimer();
 </script>
 {% endblock %}

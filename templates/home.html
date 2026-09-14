@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Home | TakaSave{% endblock %}
+{% block title %}Dashboard | TakaSave Expense Manager{% endblock %}
+{% block meta_description %}View your real-time financial balance, monthly expense analytics, category breakdown, and wallet metrics in TakaSave.{% endblock %}
 
 {% block content %}
 
 <div class="position-relative">
 
-<!-- ===== BENTO GRID ===== -->
 <div class="bento-grid">
 
-    <!-- HERO CARD -->
+    
     <div class="bento-cell hero-cell animate-fade-up">
         <div class="hero-inner h-100 p-4 p-lg-5 d-flex flex-column justify-content-between">
             <div>
@@ -27,55 +27,55 @@
         </div>
     </div>
 
-    <!-- BALANCE -->
-    <div class="bento-cell metric-cell animate-fade-up delay-1 p-4 d-flex flex-column justify-content-between">
-        <div class="d-flex justify-content-between align-items-start">
+    
+    <div class="bento-cell metric-cell animate-fade-up delay-1">
+        <div class="d-flex justify-content-between align-items-center mb-1">
             <span class="metric-label">Balance</span>
             <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
         </div>
-        <div>
+        <div class="mt-1">
             <div class="metric-value">৳{{ total_balance|floatformat:0 }}</div>
-            <small class="metric-sub"><i class="bi bi-arrow-up-right"></i> All wallets</small>
+            <small class="metric-sub"><i class="bi bi-arrow-up-right me-1"></i>All wallets</small>
         </div>
     </div>
 
-    <!-- TOTAL SPENT -->
-    <div class="bento-cell metric-cell animate-fade-up delay-2 p-4 d-flex flex-column justify-content-between">
-        <div class="d-flex justify-content-between align-items-start">
+    
+    <div class="bento-cell metric-cell animate-fade-up delay-2">
+        <div class="d-flex justify-content-between align-items-center mb-1">
             <span class="metric-label">Total Spent</span>
             <div class="metric-icon"><i class="bi bi-wallet2"></i></div>
         </div>
-        <div>
+        <div class="mt-1">
             <div class="metric-value">৳{{ total_expenses|floatformat:0 }}</div>
-            <small class="metric-sub"><i class="bi bi-infinity"></i> All time</small>
+            <small class="metric-sub"><i class="bi bi-infinity me-1"></i>All time</small>
         </div>
     </div>
 
-    <!-- THIS MONTH -->
-    <div class="bento-cell metric-cell animate-fade-up delay-3 p-4 d-flex flex-column justify-content-between">
-        <div class="d-flex justify-content-between align-items-start">
+    
+    <div class="bento-cell metric-cell animate-fade-up delay-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
             <span class="metric-label">This Month</span>
             <div class="metric-icon"><i class="bi bi-calendar-event"></i></div>
         </div>
-        <div>
+        <div class="mt-1">
             <div class="metric-value">৳{{ month_expenses|floatformat:0 }}</div>
-            <small class="metric-sub"><i class="bi bi-calendar3"></i> Current month</small>
+            <small class="metric-sub"><i class="bi bi-calendar3 me-1"></i>Current month</small>
         </div>
     </div>
 
-    <!-- LAST 7 DAYS -->
-    <div class="bento-cell metric-cell animate-fade-up delay-4 p-4 d-flex flex-column justify-content-between">
-        <div class="d-flex justify-content-between align-items-start">
+    
+    <div class="bento-cell metric-cell animate-fade-up delay-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
             <span class="metric-label">Last 7 Days</span>
             <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
         </div>
-        <div>
+        <div class="mt-1">
             <div class="metric-value">৳{{ week_expenses|floatformat:0 }}</div>
-            <small class="metric-sub"><i class="bi bi-graph-up"></i> Recent spend</small>
+            <small class="metric-sub"><i class="bi bi-graph-up me-1"></i>Recent spend</small>
         </div>
     </div>
 
-    <!-- DONUT CHART -->
+    
     <div class="bento-cell chart-cell animate-fade-up delay-2 d-flex flex-column">
         <div class="cell-header">
             <div class="cell-accent"></div>
@@ -91,7 +91,7 @@
         </div>
     </div>
 
-    <!-- BREAKDOWN -->
+    
     <div class="bento-cell breakdown-cell animate-fade-up delay-3 d-flex flex-column">
         <div class="cell-header">
             <div class="cell-accent"></div>
@@ -118,7 +118,7 @@
         </div>
     </div>
 
-    <!-- WALLETS -->
+    
     <div class="bento-cell wallets-cell animate-fade-up delay-4 d-flex flex-column">
         <div class="cell-header d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
@@ -145,10 +145,10 @@
         </div>
     </div>
 
-</div><!-- /.bento-grid -->
+</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
 <script>
 const ctxEl = document.getElementById('expenseChart');
 if (ctxEl) {
@@ -180,7 +180,6 @@ if (ctxEl) {
 </script>
 
 <style>
-/* ===== BENTO GRID ===== */
 .bento-grid {
     display: grid;
     gap: 12px;
@@ -189,7 +188,6 @@ if (ctxEl) {
     grid-template-rows: auto;
 }
 
-/* Hero: row 1-2, col 1 */
 .hero-cell {
     grid-column: 1;
     grid-row: 1 / 3;
@@ -220,7 +218,6 @@ if (ctxEl) {
     bottom: -40px; left: -40px;
 }
 
-/* Metric cards: col 2-3, rows 1-2 */
 .metric-cell {
     min-height: 120px;
     border-radius: 18px !important;
@@ -230,12 +227,10 @@ if (ctxEl) {
 .metric-cell:nth-child(4) { grid-column: 2; grid-row: 2; }
 .metric-cell:nth-child(5) { grid-column: 3; grid-row: 2; }
 
-/* Row 3 bottom cells */
 .chart-cell     { grid-column: 1; min-height: 280px; }
 .breakdown-cell { grid-column: 2; min-height: 280px; }
 .wallets-cell   { grid-column: 3; min-height: 280px; }
 
-/* Shared components */
 .live-badge {
     display: inline-flex;
     align-items: center;
@@ -335,7 +330,6 @@ if (ctxEl) {
 
 .progress-fill { background: linear-gradient(90deg,#4f46e5,#818cf8) !important; }
 
-/* Responsive */
 @media (max-width: 992px) {
     .bento-grid { grid-template-columns: 1fr 1fr; }
     .hero-cell      { grid-column: 1 / 3; grid-row: 1; min-height: 180px; }

@@ -5,9 +5,9 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
+        <div class="col-12 col-md-6 col-lg-5">
             <div class="card shadow border-0 rounded-4 mt-4 mb-5">
-                <div class="card-body p-5">
+                <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
                         <div class="icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 50%; background-color: rgba(79, 70, 229, 0.1);">
                             <i class="bi bi-shield-check fs-2 text-primary"></i>
@@ -17,11 +17,11 @@
                         <p class="text-center text-muted mb-2">We sent an OTP code to:<br><strong class="text-primary">{{ email }}</strong></p>
                     </div>
 
-                    <!-- Step 2: OTP Form -->
+                    
                     <form method="POST" action="{% url 'register_verify' %}" novalidate>
                         {% csrf_token %}
 
-                        <!-- OTP Code Input -->
+                        
                         <div class="form-floating mb-3">
                             <input 
                                 type="text" 
@@ -35,7 +35,7 @@
                             <label for="otp" class="text-muted text-start w-100"><i class="bi bi-key me-2"></i>Enter 6-Digit OTP</label>
                         </div>
 
-                        <!-- Timer and Resend -->
+                        
                         <div class="d-flex justify-content-between align-items-center mb-4 small px-1">
                             <div class="text-muted">
                                 <i class="bi bi-clock-history me-1"></i> OTP expires in: <span id="timer" class="fw-bold text-danger">05:00</span>
@@ -46,7 +46,7 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
+                        
                         <div class="d-grid mt-4 mb-3">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm">
                                 Verify & Continue <i class="bi bi-arrow-right ms-1"></i>
@@ -61,13 +61,12 @@
                     </form>
                 </div>
             </div>
-            <p class="text-center text-muted mt-3 small">© {% now "Y" %} raihanstack. All rights reserved.</p>
+            <p class="text-center text-muted mt-3 small">© {% now "Y" %} md-mostafaraihan. All rights reserved.</p>
         </div>
     </div>
 </div>
 
 <script>
-    // Setup countdown timer based on remaining seconds sent from Django
     let remainingSeconds = {{ remaining_seconds|default:300 }};
     const timerElement = document.getElementById('timer');
     const resendLink = document.getElementById('resend-link');
@@ -90,7 +89,6 @@
         setTimeout(updateTimer, 1000);
     }
 
-    // Start timer on page load
     updateTimer();
 </script>
 {% endblock %}

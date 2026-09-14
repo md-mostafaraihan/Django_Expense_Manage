@@ -1,13 +1,13 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Account Details | TakaSave{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
+        <div class="col-12 col-md-6 col-lg-5">
             <div class="card shadow border-0 rounded-4 mt-4 mb-5">
-                <div class="card-body p-5">
+                <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
                         <div class="icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 50%; background-color: rgba(16, 185, 129, 0.1);">
                             <i class="bi bi-person-check fs-2 text-success"></i>
@@ -17,11 +17,11 @@
                         <p class="text-center text-muted mb-2">Configure credentials for verified email:<br><strong class="text-success">{{ email }}</strong></p>
                     </div>
 
-                    <!-- Step 3: Registration details form -->
+                    
                     <form method="POST" action="{% url 'register_details' %}" novalidate>
                         {% csrf_token %}
 
-                        <!-- Username -->
+                        
                         <div class="form-floating mb-3">
                             <input 
                                 type="text" 
@@ -35,7 +35,7 @@
                             <label for="username" class="text-muted"><i class="bi bi-person me-2"></i>Choose Username</label>
                         </div>
 
-                        {% comment %}Password field with visibility toggle and strength indicator{% endcomment %}
+                        
                         <div class="form-floating mb-3 position-relative">
                             <input 
                                 type="password"
@@ -57,7 +57,7 @@
                             <small id="passwordStrengthText1" class="form-text text-muted"></small>
                         </div>
 
-                        {% comment %}Confirm password field with visibility toggle{% endcomment %}
+                        
                         <div class="form-floating mb-4 position-relative">
                             <input 
                                 type="password"
@@ -73,7 +73,7 @@
                             </button>
                         </div>
 
-                        <!-- Submit Button -->
+                        
                         <div class="d-grid mt-4 mb-3">
                             <button type="submit" class="btn btn-success btn-lg fw-bold rounded-pill hover-lift shadow-sm text-white">
                                 Complete Registration <i class="bi bi-check-circle ms-1"></i>
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
                 </div>
             </div>
-            <p class="text-center text-muted mt-3 small">© {% now "Y" %} raihanstack. All rights reserved.</p>
+            <p class="text-center text-muted mt-3 small">© {% now "Y" %} md-mostafaraihan. All rights reserved.</p>
         </div>
     </div>
 </div>

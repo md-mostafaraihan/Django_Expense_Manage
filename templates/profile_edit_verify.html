@@ -1,34 +1,123 @@
 {% extends "base.html" %}
-
-{% block title %}Verify Email Change | TakaSave{% endblock %}
+{% block title %}Verify Profile Change | TakaSave{% endblock %}
+{% block meta_description %}Confirm your TakaSave profile updates with your 6-digit security code sent to your registered email.{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-5">
-      <div class="card shadow border-0 rounded-4 mt-4 mb-5">
-        <div class="card-body p-5">
-          <h3 class="card-title fw-bold text-center mb-4">Verify Email Change</h3>
-          <p class="text-center text-muted mb-4">Enter the 6‑digit OTP sent to your new email address to confirm the change.</p>
-          <form method="POST">
-            {% csrf_token %}
-            <div class="form-floating mb-3">
-              <input type="text" class="form-control" id="otp" name="otp" placeholder="OTP" required pattern="\d{6}" autocomplete="one-time-code">
-              <label for="otp" class="text-muted"><i class="bi bi-key me-2"></i>OTP</label>
-            </div>
-            <div class="d-grid mt-4">
-              <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm">Verify</button>
-            </div>
-          </form>
-          <div class="mt-3 text-center">
-            <a href="{% url 'profile_edit_resend' %}" class="text-decoration-none small"><i class="bi bi-arrow-clockwise me-1"></i>Resend OTP</a>
+<div class="row justify-content-center py-4">
+  <div class="col-12 col-md-7 col-lg-6 col-xl-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <a href="{% url 'profile_edit' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+        <i class="bi bi-arrow-left me-1"></i>Cancel & Edit
+      </a>
+      <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2 fw-medium">
+        <i class="bi bi-shield-lock me-1"></i>Security Step
+      </span>
+    </div>
+
+    <div class="card glass shadow border-0 rounded-4 mb-5">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+               style="width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(99, 102, 241, 0.15));">
+            <i class="bi bi-shield-check fs-1 text-primary"></i>
           </div>
-          <div class="mt-2 text-center small">
-            <a href="{% url 'profile_edit' %}" class="text-muted">Cancel and go back</a>
+          <h3 class="card-title fw-bold text-dark text-gradient mb-1">Confirm Profile Changes</h3>
+          <p class="text-muted small mb-0">Enter the security confirmation code to save updates</p>
+        </div>
+
+        <div class="p-3 bg-light rounded-4 mb-4 border">
+          <div class="d-flex align-items-start mb-2">
+            <i class="bi bi-envelope-check text-primary fs-5 me-2 mt-1"></i>
+            <div>
+              <div class="small text-muted">A 6-digit confirmation code was dispatched to:</div>
+              <strong class="text-dark fs-6 d-block">{{ old_email }}</strong>
+            </div>
+          </div>
+          
+          <div class="pt-2 border-top mt-2">
+            <div class="small fw-semibold text-muted mb-1">Requested Changes:</div>
+            <ul class="list-unstyled small mb-0 text-dark">
+              {% if pending.email_changed %}
+                <li class="d-flex align-items-center mb-1">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  <span>New Email: <strong>{{ pending.email }}</strong></span>
+                </li>
+              {% endif %}
+              {% if pending.password_changed %}
+                <li class="d-flex align-items-center mb-1">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  <span>Password: <strong>New Password Set</strong></span>
+                </li>
+              {% endif %}
+              {% if pending.username_changed %}
+                <li class="d-flex align-items-center">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  <span>New Username: <strong>{{ pending.username }}</strong></span>
+                </li>
+              {% endif %}
+            </ul>
           </div>
         </div>
+
+        <form method="POST" action="{% url 'profile_edit_verify' %}">
+          {% csrf_token %}
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control text-center fs-3 fw-bold tracking-widest" id="otp" name="otp"
+                   placeholder="123456" maxlength="6" pattern="\d{6}" inputmode="numeric" autocomplete="one-time-code" required autofocus>
+            <label for="otp" class="text-muted text-center w-100">
+              <i class="bi bi-key me-2"></i>Enter 6-Digit Confirmation Code
+            </label>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+            <span class="small text-muted d-flex align-items-center">
+              <i class="bi bi-clock me-1 text-primary"></i>
+              <span>Code expires in: <strong id="timerText" class="text-danger ms-1">--:--</strong></span>
+            </span>
+            <a href="{% url 'profile_edit_resend' %}" id="resendBtn" class="small text-decoration-none fw-semibold">
+              <i class="bi bi-arrow-clockwise me-1"></i>Resend Code
+            </a>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm d-flex align-items-center justify-content-center">
+              <span>Verify & Save Changes</span>
+              <i class="bi bi-check-circle ms-2"></i>
+            </button>
+            <a href="{% url 'profile_edit' %}" class="btn btn-light btn-lg rounded-pill text-muted fw-semibold">
+              Cancel
+            </a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let seconds = parseInt('{{ remaining_seconds|default:300 }}', 10);
+  const timerEl = document.getElementById('timerText');
+  const resendBtn = document.getElementById('resendBtn');
+
+  function updateTimer() {
+    if (seconds <= 0) {
+      if (timerEl) {
+        timerEl.textContent = 'Expired';
+        timerEl.className = 'text-danger fw-bold ms-1';
+      }
+      return;
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    if (timerEl) {
+      timerEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+    seconds--;
+    setTimeout(updateTimer, 1000);
+  }
+
+  updateTimer();
+});
+</script>
 {% endblock %}

@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Register | TakaSave{% endblock %}
+{% block title %}Register with Email | TakaSave{% endblock %}
+{% block meta_description %}Create your free TakaSave account to start tracking daily expenses, setting up budgets, and managing wallets with smart analytics.{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
+        <div class="col-12 col-md-6 col-lg-5">
             <div class="card shadow border-0 rounded-4 mt-4 mb-5">
-                <div class="card-body p-5">
+                <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
                         <div class="icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 50%; background-color: rgba(14, 165, 233, 0.1);">
                             <i class="bi bi-envelope-check fs-2 text-info"></i>
@@ -17,11 +18,11 @@
                         <p class="text-center text-muted mb-2">We will send a 6-digit OTP to verify your email address.</p>
                     </div>
 
-                    <!-- Step 1: Email Form -->
+                    
                     <form method="POST" action="{% url 'register' %}" novalidate>
                         {% csrf_token %}
 
-                        <!-- Email Input -->
+                        
                         <div class="form-floating mb-4">
                             <input 
                                 type="email" 
@@ -35,7 +36,7 @@
                             <label for="email" class="text-muted"><i class="bi bi-envelope me-2"></i>Email address</label>
                         </div>
 
-                        <!-- Submit Button -->
+                        
                         <div class="d-grid mt-4 mb-3">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm">
                                 Send Verification OTP <i class="bi bi-arrow-right ms-1"></i>
@@ -51,7 +52,7 @@
                     </form>
                 </div>
             </div>
-            <p class="text-center text-muted mt-3 small">© {% now "Y" %} raihanstack. All rights reserved.</p>
+            <p class="text-center text-muted mt-3 small">© {% now "Y" %} md-mostafaraihan. All rights reserved.</p>
         </div>
     </div>
 </div>

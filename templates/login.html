@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 
 {% block title %}Login | TakaSave{% endblock %}
+{% block meta_description %}Securely sign in to your TakaSave expense manager account to track finances, manage budgets, and monitor wallets.{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
+        <div class="col-12 col-md-6 col-lg-5">
             <div class="card shadow border-0 rounded-4 mt-4 mb-5">
-                <div class="card-body p-5">
+                <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
                         <div class="icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 50%; background-color: rgba(79, 70, 229, 0.1);">
                             <i class="bi bi-box-arrow-in-right fs-2 text-primary"></i>
@@ -17,12 +18,11 @@
                         <p class="text-center text-muted mb-2">Login to manage your expenses securely.</p>
                     </div>
 
-
-                    <!-- Login Form -->
+                    
                     <form method="POST" action="{% url 'login' %}" novalidate>
                         {% csrf_token %}
 
-                        <!-- Email -->
+                        
                         <div class="form-floating mb-3">
                             <input 
                                 type="email" 
@@ -36,8 +36,8 @@
                             <label for="email" class="text-muted"><i class="bi bi-envelope me-2"></i>Email address</label>
                         </div>
 
-                        <!-- Password -->
-                        {% comment %}Password field with visibility toggle{% endcomment %}
+                        
+                        
 <div class="form-floating mb-3 position-relative">
     <input 
         type="password"
@@ -66,7 +66,7 @@ function togglePasswordVisibility(id) {
 }
 </script>
 
-                        <!-- Remember Me -->
+                        
                         <div class="mb-3 form-check">
                             <input 
                                 type="checkbox" 
@@ -78,7 +78,7 @@ function togglePasswordVisibility(id) {
                             </label>
                         </div>
 
-                        <!-- Submit Button -->
+                        
                         <div class="d-grid mt-4 mb-3">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill hover-lift shadow-sm">
                                 Login
@@ -95,7 +95,7 @@ function togglePasswordVisibility(id) {
                     </div>
                 </div>
             </div>
-            <p class="text-center text-muted mt-3 small">© {{ now.year }} raihanstack. All rights reserved.</p>
+            <p class="text-center text-muted mt-3 small">© {{ now.year }} md-mostafaraihan. All rights reserved.</p>
         </div>
     </div>
 </div>

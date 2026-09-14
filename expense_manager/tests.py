@@ -362,7 +362,42 @@ class ProfileEditFlowTests(TestCase):
         session = self.client.session
         self.assertIsNotNone(session.get('profile_edit_pending'))
         self.assertEqual(session.get('profile_edit_pending').get('email'), 'newemail@example.com')
+        self.assertEqual(session.get('profile_edit_pending').get('old_email'), 'profile@example.com')
         self.assertIsNotNone(session.get('profile_edit_otp'))
+
+    def test_profile_edit_password_change_sends_otp(self):
+        response = self.client.post(reverse('profile_edit'), {
+            'username': 'profileuser',
+            'email': 'profile@example.com',
+            'password1': 'NewSecretPassword123!',
+            'password2': 'NewSecretPassword123!'
+        })
+        self.assertRedirects(response, reverse('profile_edit_verify'))
+        session = self.client.session
+        pending = session.get('profile_edit_pending')
+        self.assertIsNotNone(pending)
+        self.assertTrue(pending.get('password_changed'))
+        self.assertEqual(pending.get('old_email'), 'profile@example.com')
+        self.assertIsNotNone(session.get('profile_edit_otp'))
+
+    def test_profile_edit_verify_applies_changes(self):
+        self.client.post(reverse('profile_edit'), {
+            'username': 'updateduser',
+            'email': 'updated@example.com',
+            'password1': 'BrandNewPassword123!',
+            'password2': 'BrandNewPassword123!'
+        })
+        session = self.client.session
+        otp = session.get('profile_edit_otp')
+        self.assertIsNotNone(otp)
+
+        verify_resp = self.client.post(reverse('profile_edit_verify'), {'otp': otp})
+        self.assertRedirects(verify_resp, reverse('account_details'))
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'updateduser')
+        self.assertEqual(self.user.email, 'updated@example.com')
+        self.assertTrue(self.user.check_password('BrandNewPassword123!'))
 
 
 

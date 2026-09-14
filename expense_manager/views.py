@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseNotFound 
+from django.http import HttpResponse, HttpResponseNotFound 
 from .models import Expense, Category, Wallet
 from django.contrib import messages 
 from django.contrib.auth.models import User 
@@ -19,7 +19,6 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 from django.conf import settings
 
-# Maximum allowed expense amount
 MAX_EXPENSE_AMOUNT = Decimal('1000000')
 
 def user_login(request):
@@ -63,8 +62,8 @@ def user_register(request):
         if not email:
             messages.error(request, "Email is required!")
             errors = True
-        elif User.objects.filter(email=email).exists():
-            messages.error(request, "Email already registered!")
+        elif User.objects.filter(email__iexact=email).exists():
+            messages.error(request, "Email already registered! Please login instead.")
             errors = True
 
         if not errors:
@@ -74,6 +73,9 @@ def user_register(request):
             request.session['registration_otp'] = otp
             request.session['registration_otp_expiry'] = (timezone.now() + timezone.timedelta(minutes=5)).timestamp()
             request.session['email_verified'] = False
+
+            if settings.DEBUG:
+                print(f"[DEBUG OTP] Generated OTP for {email}: {otp}")
 
             try:
                 from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'raihan.invite@gmail.com')
@@ -88,6 +90,9 @@ def user_register(request):
                 return redirect("register_verify")
             except Exception as e:
                 print(f"Error sending verification email: {e}")
+                if settings.DEBUG:
+                    messages.warning(request, f"Could not send email ({e}). Offline testing OTP: {otp}")
+                    return redirect("register_verify")
                 messages.error(request, "Failed to send email. Please check your SMTP settings or try again.")
 
     return render(request, "register.html")
@@ -143,6 +148,9 @@ def user_register_resend(request):
     request.session['registration_otp'] = otp
     request.session['registration_otp_expiry'] = (timezone.now() + timezone.timedelta(minutes=5)).timestamp()
 
+    if settings.DEBUG:
+        print(f"[DEBUG OTP] Resent OTP for {email}: {otp}")
+
     try:
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'raihan.invite@gmail.com')
         send_mail(
@@ -154,7 +162,11 @@ def user_register_resend(request):
         )
         messages.success(request, f"OTP has been resent to {email}.")
     except Exception as e:
-        messages.error(request, "Failed to send email. Please check your SMTP settings.")
+        print(f"Error resending verification email: {e}")
+        if settings.DEBUG:
+            messages.warning(request, f"Could not send email ({e}). Offline testing OTP: {otp}")
+        else:
+            messages.error(request, "Failed to send email. Please check your SMTP settings.")
 
     return redirect("register_verify")
 
@@ -180,8 +192,11 @@ def user_register_details(request):
         if not username:
             messages.error(request, "Username is required!")
             errors = True
-        elif User.objects.filter(username=username).exists():
+        elif User.objects.filter(username__iexact=username).exists():
             messages.error(request, "Username already exists!")
+            errors = True
+        elif User.objects.filter(email__iexact=email).exists():
+            messages.error(request, "This email is already registered. Please login instead.")
             errors = True
 
         if not password1:
@@ -630,39 +645,47 @@ def account_details(request):
 
 @login_required(login_url='/login/')
 def profile_edit(request):
-    """Render profile edit form. Handles email change with OTP verification."""
     user = request.user
     if request.method == "POST":
         new_username = request.POST.get('username', '').strip()
-        new_email = request.POST.get('email', '').strip()
+        new_email = request.POST.get('email', '').strip().lower()
         new_password1 = request.POST.get('password1', '')
         new_password2 = request.POST.get('password2', '')
         errors = False
 
-        # Username validation
+        username_changed = bool(new_username and new_username != user.username)
+        email_changed = bool(new_email and new_email != user.email.lower())
+        password_changed = bool(new_password1 or new_password2)
+
         if not new_username:
             messages.error(request, "Username is required!")
             errors = True
-        elif new_username != user.username and User.objects.filter(username=new_username).exists():
+        elif username_changed and User.objects.filter(username__iexact=new_username).exclude(pk=user.pk).exists():
             messages.error(request, "Username already taken!")
             errors = True
 
-        # Email validation (optional but if provided must be unique)
         if not new_email:
             messages.error(request, "Email is required!")
             errors = True
-        elif new_email != user.email and User.objects.filter(email=new_email).exists():
+        elif email_changed and User.objects.filter(email__iexact=new_email).exclude(pk=user.pk).exists():
             messages.error(request, "Email already registered by another user!")
             errors = True
 
-        # Password validation (optional)
-        if new_password1 or new_password2:
+        if password_changed:
             if new_password1 != new_password2:
                 messages.error(request, "Passwords do not match!")
                 errors = True
             elif len(new_password1) < 8:
                 messages.error(request, "Password must be at least 8 characters.")
                 errors = True
+
+        if not any([username_changed, email_changed, password_changed]):
+            messages.error(request, "No changes detected.")
+            return render(request, 'profile_edit.html', {
+                'user': user,
+                'form_username': new_username or user.username,
+                'form_email': new_email or user.email
+            })
 
         if errors:
             return render(request, 'profile_edit.html', {
@@ -671,78 +694,71 @@ def profile_edit(request):
                 'form_email': new_email
             })
 
-        # Collect pending changes (username, email, password)
+        if not email_changed and not password_changed:
+            user.username = new_username
+            user.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect('account_details')
+
         pending_changes = {
-            'username': new_username,
-            'email': new_email,
-            'password': new_password1,
+            'username': new_username if username_changed else user.username,
+            'email': new_email if email_changed else user.email,
+            'password': new_password1 if password_changed else None,
+            'username_changed': username_changed,
+            'email_changed': email_changed,
+            'password_changed': password_changed,
+            'old_email': user.email,
         }
-        # Determine what fields are actually changing
-        email_changed = new_email and new_email != user.email
-        username_changed = new_username != user.username
-        password_changed = new_password1 != ''
 
-        # Validate that at least one field is being changed
-        if not any([email_changed, username_changed, password_changed]):
-            messages.error(request, "No changes detected.")
-            return render(request, 'profile_edit.html', {
-                'user': user,
-                'form_username': new_username,
-                'form_email': new_email
-            })
-
-        # If only username/password are changing (no email change), apply directly without OTP
-        if not email_changed:
-            try:
-                if username_changed:
-                    user.username = new_username
-                if password_changed:
-                    user.set_password(new_password1)
-                user.save()
-                if password_changed:
-                    # Preserve login after password change
-                    from django.contrib.auth import update_session_auth_hash
-                    update_session_auth_hash(request, user)
-                messages.success(request, "Profile updated successfully.")
-                return redirect('account_details')
-            except Exception as e:
-                messages.error(request, f"Failed to update profile: {str(e)}")
-                return render(request, 'profile_edit.html', {
-                    'user': user,
-                    'form_username': new_username,
-                    'form_email': new_email
-                })
-
-        # Otherwise, require OTP (email change or both email and other fields)
-        # Store pending changes in session for OTP verification
-        request.session['profile_edit_pending'] = pending_changes
-        # Generate OTP
         import random
         otp = str(random.randint(100000, 999999))
+        request.session['profile_edit_pending'] = pending_changes
         request.session['profile_edit_otp'] = otp
         request.session['profile_edit_otp_expiry'] = (timezone.now() + timezone.timedelta(minutes=5)).timestamp()
-        
-        # Send OTP email to the new email
-        target_email = new_email
+
+        old_target_email = user.email
+
+        if settings.DEBUG:
+            print(f"[DEBUG OTP] Profile edit OTP for {old_target_email} (old email): {otp}")
+
+        change_items = []
+        if email_changed:
+            change_items.append(f"Email: {user.email} -> {new_email}")
+        if password_changed:
+            change_items.append("Password update")
+        if username_changed:
+            change_items.append(f"Username: {user.username} -> {new_username}")
+        summary_str = ", ".join(change_items)
+
         try:
-            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'raihan.invite@gmail.com')
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or settings.EMAIL_HOST_USER or 'raihan.invite@gmail.com'
             send_mail(
-                subject="TakaSave Profile Change OTP",
-                message=f"Your OTP for confirming profile changes is {otp}. It is valid for 5 minutes.",
+                subject="TakaSave Security Alert: Profile Change Verification Code",
+                message=(
+                    f"Hello {user.username},\n\n"
+                    f"A request was submitted to update your TakaSave profile details ({summary_str}).\n\n"
+                    f"Your 6-digit confirmation security code is: {otp}\n\n"
+                    f"This code will expire in 5 minutes.\n"
+                    f"If you did NOT request this change, please sign into your account and secure your credentials immediately."
+                ),
                 from_email=from_email,
-                recipient_list=[target_email],
+                recipient_list=[old_target_email],
                 fail_silently=False,
             )
-            messages.success(request, f"OTP sent to {target_email}. Verify to apply changes.")
+            messages.success(request, f"A security confirmation code was sent to your current registered email ({old_target_email}). Please verify to apply changes.")
             return redirect('profile_edit_verify')
         except Exception as e:
-            messages.error(request, f"Failed to send OTP email: {str(e)}")
+            print(f"Error sending profile change OTP to old email: {e}")
+            if settings.DEBUG:
+                messages.warning(request, f"Email delivery failed ({e}). Offline testing OTP: {otp}")
+                return redirect('profile_edit_verify')
+            messages.error(request, "Failed to send verification email to your current registered email. Please check your SMTP settings.")
             return render(request, 'profile_edit.html', {
                 'user': user,
                 'form_username': new_username,
                 'form_email': new_email
             })
-    # GET request – prefill form
+
     return render(request, 'profile_edit.html', {
         'user': user,
         'form_username': user.username,
@@ -751,71 +767,88 @@ def profile_edit(request):
 
 @login_required(login_url='/login/')
 def profile_edit_verify(request):
-    """Verify OTP for email change and apply pending profile updates."""
     pending = request.session.get('profile_edit_pending')
     if not pending:
-        messages.error(request, "No pending profile changes.")
+        messages.error(request, "No pending profile changes found.")
         return redirect('profile_edit')
+
+    expiry = request.session.get('profile_edit_otp_expiry', 0)
+    remaining = int(expiry - timezone.now().timestamp())
+    if remaining < 0:
+        remaining = 0
+
     if request.method == "POST":
         user_otp = request.POST.get('otp', '').strip()
         session_otp = request.session.get('profile_edit_otp')
-        expiry = request.session.get('profile_edit_otp_expiry', 0)
+
         if not user_otp:
-            messages.error(request, "OTP is required!")
+            messages.error(request, "Confirmation code is required!")
         elif timezone.now().timestamp() > expiry:
-            messages.error(request, "OTP expired! Please resend.")
+            messages.error(request, "Confirmation code has expired! Please click Resend Code.")
         elif user_otp != session_otp:
-            messages.error(request, "Invalid OTP.")
+            messages.error(request, "Invalid confirmation code. Please check and try again.")
         else:
-            # OTP valid – apply changes
             user = request.user
-            new_username = pending.get('username')
-            new_email = pending.get('email')
-            new_password = pending.get('password')
-            if new_username and new_username != user.username:
-                user.username = new_username
-            if new_email and new_email != user.email:
-                user.email = new_email
-            if new_password:
-                user.set_password(new_password)
-                # Preserve login after password change
+            if pending.get('username_changed') and pending.get('username'):
+                user.username = pending['username']
+            if pending.get('email_changed') and pending.get('email'):
+                user.email = pending['email']
+            if pending.get('password_changed') and pending.get('password'):
+                user.set_password(pending['password'])
                 from django.contrib.auth import update_session_auth_hash
                 update_session_auth_hash(request, user)
             user.save()
-            # Cleanup session
+
             for key in ['profile_edit_pending', 'profile_edit_otp', 'profile_edit_otp_expiry']:
                 request.session.pop(key, None)
-            messages.success(request, "Profile updated successfully.")
+
+            messages.success(request, "Profile updated successfully! All changes have been saved.")
             return redirect('account_details')
-    return render(request, 'profile_edit_verify.html')
+
+    return render(request, 'profile_edit_verify.html', {
+        'pending': pending,
+        'old_email': pending.get('old_email', request.user.email),
+        'remaining_seconds': remaining
+    })
 
 @login_required(login_url='/login/')
 def profile_edit_resend(request):
-    """Resend OTP for email change."""
     pending = request.session.get('profile_edit_pending')
     if not pending:
         messages.error(request, "No pending profile changes.")
         return redirect('profile_edit')
-    new_email = pending.get('email')
-    if not new_email:
-        messages.error(request, "Email not changed.")
-        return redirect('profile_edit')
+
+    old_target_email = pending.get('old_email', request.user.email)
     import random
     otp = str(random.randint(100000, 999999))
     request.session['profile_edit_otp'] = otp
     request.session['profile_edit_otp_expiry'] = (timezone.now() + timezone.timedelta(minutes=5)).timestamp()
+
+    if settings.DEBUG:
+        print(f"[DEBUG OTP] Resent profile edit OTP for {old_target_email} (old email): {otp}")
+
     try:
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'raihan.invite@gmail.com')
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or settings.EMAIL_HOST_USER or 'raihan.invite@gmail.com'
         send_mail(
-            subject="TakaSave Email Change OTP (Resend)",
-            message=f"Your OTP for email change is {otp}. It is valid for 5 minutes.",
+            subject="TakaSave Security Alert: Profile Change Verification Code (Resent)",
+            message=(
+                f"Hello {request.user.username},\n\n"
+                f"Your resent confirmation security code is: {otp}\n\n"
+                f"This code will expire in 5 minutes.\n"
+                f"If you did NOT request this change, please sign into your account and secure your credentials immediately."
+            ),
             from_email=from_email,
-            recipient_list=[new_email],
+            recipient_list=[old_target_email],
             fail_silently=False,
         )
-        messages.success(request, f"OTP resent to {new_email}.")
+        messages.success(request, f"New confirmation code has been resent to your current registered email ({old_target_email}).")
     except Exception as e:
-        messages.error(request, "Failed to send OTP email.")
+        print(f"Error resending profile change OTP: {e}")
+        if settings.DEBUG:
+            messages.warning(request, f"Email delivery failed ({e}). Offline testing OTP: {otp}")
+        else:
+            messages.error(request, "Failed to send confirmation email. Please check your SMTP settings.")
+
     return redirect('profile_edit_verify')
 
 @login_required(login_url='/login/')
@@ -1052,3 +1085,41 @@ def handler404(request, exception=None):
 
 def handler500(request):
     return render(request, '500.html', status=500)
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /password-reset/",
+        "Disallow: /register/verify/",
+        "Disallow: /profile/edit/",
+        "Disallow: /account/delete/",
+        f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+def sitemap_xml(request):
+    try:
+        domain = request.build_absolute_uri('/')[:-1]
+    except Exception:
+        domain = "https://takasave.vercel.app"
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{domain}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>{domain}/login/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{domain}/register/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>"""
+    return HttpResponse(xml, content_type="application/xml")

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Wallets | TakaSave{% endblock %}
+{% block title %}Wallets & Accounts | TakaSave{% endblock %}
+{% block meta_description %}Manage your digital and cash wallets, check live balances, deposit funds, and transfer money between accounts with TakaSave.{% endblock %}
 
 {% block content %}
 <div class="container my-4">
-    <!-- Header Section -->
-    <div class="row mb-5 align-items-center">
+    
+    <div class="row mb-4 align-items-center">
         <div class="col-12 col-md-6 mb-3 mb-md-0">
             <h2 class="fw-bold mb-1 text-dark">My Wallets</h2>
             <p class="text-muted mb-0">Manage your accounts, check balances, transfer funds, or top up.</p>
@@ -23,39 +24,39 @@
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="row g-4 mb-5">
-        <div class="col-12 col-md-6">
-            <div class="card border-0 shadow-sm h-100 rounded-4 hover-lift" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-left: 5px solid #4f46e5 !important;">
-                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+    
+    <div class="row g-3 mb-4">
+        <div class="col-6">
+            <div class="card border-0 shadow-sm rounded-4 hover-lift" style="background: #ffffff; border-left: 5px solid #4f46e5 !important; border: 1px solid rgba(226, 232, 240, 0.85);">
+                <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Total Net Balance</h6>
-                        <h3 class="fw-extrabold text-dark mb-0">৳ {{ total_balance|floatformat:2 }}</h3>
+                        <div class="text-muted fw-bold text-uppercase tracking-wider mb-1" style="font-size: 0.72rem; letter-spacing: 0.8px;">Total Net Balance</div>
+                        <h3 class="fw-bold text-dark mb-0 fs-3">৳ {{ total_balance|floatformat:2 }}</h3>
                     </div>
-                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; border-radius: 12px; background-color: rgba(79, 70, 229, 0.1);">
-                        <i class="bi bi-cash-stack fs-3 text-gradient"></i>
+                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; border-radius: 12px; background-color: rgba(79, 70, 229, 0.08);">
+                        <i class="bi bi-cash-stack fs-4 text-primary"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
-            <div class="card border-0 shadow-sm h-100 rounded-4 hover-lift" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-left: 5px solid #0ea5e9 !important;">
-                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div class="col-6">
+            <div class="card border-0 shadow-sm rounded-4 hover-lift" style="background: #ffffff; border-left: 5px solid #0ea5e9 !important; border: 1px solid rgba(226, 232, 240, 0.85);">
+                <div class="card-body py-3 px-4 d-flex align-items-center justify-content-between">
                     <div>
-                        <h6 class="text-muted fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Active Wallets</h6>
-                        <h3 class="fw-extrabold text-dark mb-0">{{ wallets|length }}</h3>
+                        <div class="text-muted fw-bold text-uppercase tracking-wider mb-1" style="font-size: 0.72rem; letter-spacing: 0.8px;">Active Wallets</div>
+                        <h3 class="fw-bold text-dark mb-0 fs-3">{{ wallets|length }}</h3>
                     </div>
-                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; border-radius: 12px; background-color: rgba(14, 165, 233, 0.1);">
-                        <i class="bi bi-wallet2 fs-3" style="color: #0ea5e9;"></i>
+                    <div class="icon-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; border-radius: 12px; background-color: rgba(14, 165, 233, 0.08);">
+                        <i class="bi bi-wallet2 fs-4" style="color: #0ea5e9;"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Wallets Cards Grid -->
+    
     <h4 class="fw-bold mb-4 text-dark">My Cards</h4>
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-4">
         {% for wallet in wallets %}
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="card border-0 rounded-4 overflow-hidden position-relative hover-lift shadow-lg" 
@@ -70,7 +71,7 @@
                                 background: linear-gradient(135deg, #f59e0b 0%, #78350f 100%);
                             {% endif %}
                             color: white;">
-                    <!-- Overlay chip vector -->
+                    
                     <div class="position-absolute" style="top: 25px; left: 25px; opacity: 0.85;">
                         <svg width="45" height="35" viewBox="0 0 45 35" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="45" height="35" rx="6" fill="#FBBF24" fill-opacity="0.9"/>
@@ -81,7 +82,7 @@
                         </svg>
                     </div>
 
-                    <!-- Delete and Edit Buttons -->
+                    
                     <div class="position-absolute d-flex gap-2" style="top: 20px; right: 20px; z-index: 10;">
                         <button class="btn btn-sm rounded-circle text-white hover-lift d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(255, 255, 255, 0.2); border: none;" data-bs-toggle="modal" data-bs-target="#editWalletModal{{ wallet.id }}" title="Edit">
                             <i class="bi bi-pencil-fill" style="font-size: 0.85rem;"></i>
@@ -120,13 +121,9 @@
 {% endblock %}
 
 {% block modals %}
-<!-- =========================
-     Action Modals (Rendered outside transformed parent to prevent Bootstrap backdrop overlay bug)
-     ========================= -->
 
-<!-- Edit & Delete Modals for each wallet -->
 {% for wallet in wallets %}
-    <!-- Edit Wallet Modal -->
+    
     <div class="modal fade" id="editWalletModal{{ wallet.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -155,7 +152,7 @@
         </div>
     </div>
 
-    <!-- Delete Wallet Modal -->
+    
     <div class="modal fade" id="deleteWalletModal{{ wallet.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -181,7 +178,6 @@
     </div>
 {% endfor %}
 
-<!-- Create Wallet Modal -->
 <div class="modal fade" id="createWalletModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -210,7 +206,6 @@
     </div>
 </div>
 
-<!-- Deposit Modal (Top Up) -->
 <div class="modal fade" id="depositModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -244,7 +239,6 @@
     </div>
 </div>
 
-<!-- Transfer Modal -->
 <div class="modal fade" id="transferModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow-lg">
