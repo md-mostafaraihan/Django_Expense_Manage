@@ -94,7 +94,11 @@ if IS_VERCEL:
     # Use cookie-only message storage so messages never touch the read-only DB
     MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
     # HTTPS / security hardening for production
-    SECURE_SSL_REDIRECT = True
+    # NOTE: Do NOT use SECURE_SSL_REDIRECT on Vercel — Vercel terminates SSL
+    # at the proxy level and forwards HTTP to Django, causing infinite redirect loops.
+    # Instead, trust Vercel's X-Forwarded-Proto header.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
