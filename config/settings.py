@@ -83,6 +83,16 @@ else:
         )
     }
 
+# On Vercel the SQLite file is read-only, so we use signed cookies for sessions.
+# Locally we use the DB backend so Django admin session management works normally.
+if IS_VERCEL:
+    SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    # Use cookie-only message storage so messages never touch the read-only DB
+    MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
