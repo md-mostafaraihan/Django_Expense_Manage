@@ -301,12 +301,10 @@ def home(request):
     start_week = today - timedelta(days=7)
     start_month = today.replace(day=1)
 
-    # Ensure categories exist
     if not Category.objects.exists():
         for cat_name in ["Food", "Travel", "Rent", "Utilities", "Entertainment", "Others"]:
             Category.objects.get_or_create(name=cat_name)
 
-    # Ensure default 'Cash' wallet exists
     wallets = Wallet.objects.filter(user=user)
     if not wallets.exists():
         Wallet.objects.create(user=user, name="Cash", balance=Decimal('0.00'))
@@ -318,9 +316,11 @@ def home(request):
 
     category_data = Expense.objects.filter(user=user).values('category__name').annotate(total=Sum('amount')).order_by('-total')
 
-    # Wallet summary
     wallets = wallets.order_by('name')
     total_balance = wallets.aggregate(total=Sum('balance'))['total'] or 0
+
+    recent_expenses = Expense.objects.filter(user=user).select_related('category', 'wallet').order_by('-date')[:5]
+    total_transactions = Expense.objects.filter(user=user).count()
 
     context = {
         'total_expenses': total_expenses,
@@ -329,6 +329,8 @@ def home(request):
         'category_data': category_data,
         'wallets': wallets,
         'total_balance': total_balance,
+        'recent_expenses': recent_expenses,
+        'total_transactions': total_transactions,
     }
     return render(request, 'home.html', context)
 
@@ -637,8 +639,6 @@ def account_details(request):
         'total_expenses': total_expenses
     })
 
-@login_required(login_url='/login/')
-
 # =========================
 # Profile Edit Views
 # =========================
@@ -852,7 +852,6 @@ def profile_edit_resend(request):
     return redirect('profile_edit_verify')
 
 @login_required(login_url='/login/')
-
 def account_delete(request):
     """Handle account deletion with OTP verification."""
     user = request.user
